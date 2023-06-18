@@ -115,14 +115,68 @@ class Use:
         except (Exception, psycopg2.DatabaseError):
             print('Либо нужно вначале удалить телефон, либо введены неверные данные')
 
-    def search(self, table, defines_column, search_data):
-        """Поиск клиента по любым данным, с указанием таблицы поиска"""
+    def search_by_one(self, table, defines_column, search_data):
+        """Поиск клиента по одному аргументу, с указанием таблицы поиска"""
         try:
-            fill = """SELECT Client.id, Client.first_name, Client.last_name, Phone.number_phone  
+            fill = """SELECT Client.id, Client.first_name, Client.last_name, Phone.number_phone
             FROM Client
             JOIN Phone ON Phone.client_id = Client.id
             WHERE %s.%s = %s;"""
             safe = (AsIs(table), AsIs(defines_column), search_data)
+            self.cursor.execute_safity(fill, safe)
+            print(self.cursor.fetchall())
+        except (Exception, psycopg2.DatabaseError):
+            print('Введены неверные данные или что-то пошло не так')
+
+    def search(self, first_name=None, last_name=None, email=None, number_phone=None, client_id=None):
+        """Поиск клиента по любым данным"""
+        if first_name is None and last_name is None and email is None and number_phone is None and client_id is None:
+            print('Вы не ввели ни одного аргумента')
+            return
+
+        fill = 'SELECT c.id, c.first_name, c.last_name, p.number_phone FROM Client AS c JOIN Phone AS p ON ' \
+               'p.client_id = c.id'
+        v_safe = []
+        v_count = 0
+        v_str = ''
+
+        if first_name is not None:
+            v_safe.append(first_name)
+            v_str = 'c.first_name = %s '
+            v_count = 1
+
+        if last_name is not None:
+            v_safe.append(last_name)
+            if v_count == 0:
+                v_str = 'c.last_name = %s '
+                v_count = 1
+            else:
+                v_str = v_str + ' AND c.last_name = %s '
+                v_count += 1
+
+        if email is not None:
+            v_safe.append(email)
+            if v_count == 0:
+                v_str = 'c.email = %s '
+                v_count = 1
+            else:
+                v_str = v_str + ' AND c.email = %s '
+                v_count += 1
+
+        if number_phone is not None:
+            v_safe.append(number_phone)
+            if v_count == 0:
+                v_str = 'p.number_phone = %s '
+                v_count += 1
+            else:
+                v_str = v_str + ' AND p.number_phone = %s '
+                v_count += 1
+
+        if v_str != '':
+            fill = fill + ' WHERE ' + v_str
+        fill = fill + ';'
+        safe = tuple(v_safe)
+        try:
             self.cursor.execute_safity(fill, safe)
             print(self.cursor.fetchall())
         except (Exception, psycopg2.DatabaseError):
@@ -147,16 +201,21 @@ data.add_from_file()
 data.add_client('4', 'Анастасия', 'Петрова', 'sun@yandex.ru')
 data.add_phone('4', '113311', '3')
 
-# изменение данных по id
+# изменение данных
 data.update('Client', 'first_name', 'Александр', 'id', 1)
 data.update('Client', 'email', 'ivanova-1989@mail.ru', 'last_name', 'Иванова')
 data.update('Phone', 'number_phone', '332233', 'number_phone', 223322)
 data.update('Client', 'last_name', 'Петрова', 'email', 'ivanova-1989@mail.ru')
 
-# поиск клиента
-data.search('Client', 'id', 3)
-data.search('Client', 'first_name', 'Александр')
-data.search('Phone', 'number_phone', 224422)
+# поиск клиента по однному аргументу
+data.search_by_one('Client', 'id', 3)
+data.search_by_one('Client', 'first_name', 'Александр')
+data.search_by_one('Phone', 'number_phone', 224422)
+
+# поиск клиента по любому параменту
+data.search(first_name='Александр', number_phone=224422)
+data.search(first_name='Александр')
+data.search()
 
 # удаление клиента или телефона
 data.delete('Client', 'id', 4)
