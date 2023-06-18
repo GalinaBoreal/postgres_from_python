@@ -116,7 +116,7 @@ class Use:
             print('Либо нужно вначале удалить телефон, либо введены неверные данные')
 
     def search_by_one(self, table, defines_column, search_data):
-        """Поиск клиента по одному аргументу, с указанием таблицы поиска"""
+        """Поиск клиента по одному аргументу с указанием таблицы поиска"""
         try:
             fill = """SELECT Client.id, Client.first_name, Client.last_name, Phone.number_phone
             FROM Client
