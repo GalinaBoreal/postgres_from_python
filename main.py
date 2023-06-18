@@ -186,39 +186,38 @@ class Use:
         self.cursor.close()
 
 if __name__ == "__main__":
+    data = Use()
 
-data = Use()
+    # # создание таблиц напрямую
+    # data.create_table()
 
-# # создание таблиц напрямую
-# data.create_table()
+    # создание таблиц из файла
+    data.create_table_from_file()
 
-# создание таблиц из файла
-data.create_table_from_file()
+    # заполнение таблиц из файла
+    data.add_from_file()
 
-# заполнение таблиц из файла
-data.add_from_file()
+    # заполнение таблиц напрямую
+    data.add_client('4', 'Анастасия', 'Петрова', 'sun@yandex.ru')
+    data.add_phone('4', '113311', '3')
 
-# заполнение таблиц напрямую
-data.add_client('4', 'Анастасия', 'Петрова', 'sun@yandex.ru')
-data.add_phone('4', '113311', '3')
+    # изменение данных
+    data.update('Client', 'first_name', 'Александр', 'id', 1)
+    data.update('Client', 'email', 'ivanova-1989@mail.ru', 'last_name', 'Иванова')
+    data.update('Phone', 'number_phone', '332233', 'number_phone', 223322)
+    data.update('Client', 'last_name', 'Петрова', 'email', 'ivanova-1989@mail.ru')
 
-# изменение данных
-data.update('Client', 'first_name', 'Александр', 'id', 1)
-data.update('Client', 'email', 'ivanova-1989@mail.ru', 'last_name', 'Иванова')
-data.update('Phone', 'number_phone', '332233', 'number_phone', 223322)
-data.update('Client', 'last_name', 'Петрова', 'email', 'ivanova-1989@mail.ru')
+    # поиск клиента по однному аргументу
+    data.search_by_one('Client', 'id', 3)
+    data.search_by_one('Client', 'first_name', 'Александр')
+    data.search_by_one('Phone', 'number_phone', 224422)
 
-# поиск клиента по однному аргументу
-data.search_by_one('Client', 'id', 3)
-data.search_by_one('Client', 'first_name', 'Александр')
-data.search_by_one('Phone', 'number_phone', 224422)
+    # поиск клиента по любому параменту
+    data.search(first_name='Александр', number_phone=224422)
+    data.search(first_name='Александр')
+    data.search()
 
-# поиск клиента по любому параменту
-data.search(first_name='Александр', number_phone=224422)
-data.search(first_name='Александр')
-data.search()
-
-# удаление клиента или телефона
-data.delete('Client', 'id', 4)
-data.delete('Phone', 'number_phone', 332233)
-data.delete('Client', 'id', 3)
+    # удаление клиента или телефона
+    data.delete('Client', 'id', 4)
+    data.delete('Phone', 'number_phone', 332233)
+    data.delete('Client', 'id', 3)
