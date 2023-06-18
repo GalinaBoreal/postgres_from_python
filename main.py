@@ -185,6 +185,7 @@ class Use:
     def __del__(self):
         self.cursor.close()
 
+if __name__ == "__main__":
 
 data = Use()
 
